@@ -1,0 +1,47 @@
+{
+    "$schema": "https://flightcontrol.dev/schemas/config.json",
+    "environments": [
+        {
+            "id": "production",
+            "name": "Production Environment",
+            "region": "us-east-1",
+            "source": {
+                "branch": "main"
+            },
+            "services": [
+                {
+                    "id": "debt-assess-backend",
+                    "name": "Debt Assessment Backend",
+                    "type": "web",
+                    "buildType": "nixpacks",
+                    "repository": {
+                        "branch": "main"
+                    },
+                    "build": {
+                        "command": "npm install && npm run build"
+                    },
+                    "start": {
+                        "command": "npm start"
+                    },
+                    "port": 3000,
+                    "healthCheckPath": "/api/health",
+                    "env": {
+                        "NODE_ENV": "production",
+                        "PORT": {"fromService": {"id": "debt-assess-backend", "value": "port"}},
+                        "FRONTEND_URL": {"fromService": {"id": "debt-assess-backend", "value": "url"}},
+                        "AIRTABLE_BASE_ID": {"fromSecret": "AIRTABLE_BASE_ID"},
+                        "AIRTABLE_API_KEY": {"fromSecret": "AIRTABLE_API_KEY"}
+                    },
+                    "ci": {
+                        "type": "ec2"
+                    },
+                    "cpu": 0.5,
+                    "memory": 1,
+                    "minInstances": 1,
+                    "maxInstances": 3,
+                    "nodeVersion": "18"
+                }
+            ]
+        }
+    ]
+}
