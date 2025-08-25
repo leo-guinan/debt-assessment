@@ -13,7 +13,7 @@
                     "id": "debt-assess-backend",
                     "name": "Debt Assessment Backend",
                     "type": "web",
-                    "buildType": "nodejs",
+                    "buildType": "nixpacks",
                     "repository": {
                         "branch": "main"
                     },
