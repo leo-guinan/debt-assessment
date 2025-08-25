@@ -13,21 +13,19 @@
                     "id": "debt-assess-backend",
                     "name": "Debt Assessment Backend",
                     "type": "web",
-                    "buildType": "nixpacks",
+                    "buildType": "nodejs",
                     "repository": {
                         "branch": "main"
                     },
-                    "build": {
-                        "command": "npm install && npm run build"
-                    },
-                    "start": {
-                        "command": "NODE_ENV=production node server.js"
-                    },
+                    "buildCommand": "npm install && npm run build",
+                    "startCommand": "node server.js",
                     "port": 3000,
+                    "installCommand": "npm install",
                     "healthCheckPath": "/api/health",
                     "env": {
                         "NODE_ENV": "production",
                         "PORT": {"fromService": {"id": "debt-assess-backend", "value": "port"}}
+                       
                     },
                     "ci": {
                         "type": "ec2"

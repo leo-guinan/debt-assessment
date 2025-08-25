@@ -1,0 +1,36 @@
+{
+    "$schema": "https://flightcontrol.dev/schemas/config.json",
+    "environments": [
+        {
+            "id": "production",
+            "name": "Production",
+            "region": "us-east-1",
+            "source": {
+                "branch": "main"
+            },
+            "services": [
+                {
+                    "id": "debt-assess-app",
+                    "name": "Debt Assessment App",
+                    "type": "fargate",
+                    "buildType": "docker",
+                    "dockerfilePath": "./Dockerfile",
+                    "port": 3001,
+                    "healthCheckPath": "/api/health",
+                    "healthCheckIntervalSeconds": 30,
+                    "healthCheckTimeoutSeconds": 10,
+                    "cpu": 0.5,
+                    "memory": 1,
+                    "minInstances": 1,
+                    "maxInstances": 3,
+                    "env": {
+                        "NODE_ENV": "production",
+                        "PORT": "3001",
+                        "AIRTABLE_BASE_ID": {"fromSecret": "AIRTABLE_BASE_ID"},
+                        "AIRTABLE_API_KEY": {"fromSecret": "AIRTABLE_API_KEY"}
+                    }
+                }
+            ]
+        }
+    ]
+}
