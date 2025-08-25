@@ -21,16 +21,13 @@
                         "command": "npm install && npm run build"
                     },
                     "start": {
-                        "command": "npm start"
+                        "command": "NODE_ENV=production node server.js"
                     },
                     "port": 3000,
                     "healthCheckPath": "/api/health",
                     "env": {
                         "NODE_ENV": "production",
-                        "PORT": {"fromService": {"id": "debt-assess-backend", "value": "port"}},
-                        "FRONTEND_URL": {"fromService": {"id": "debt-assess-backend", "value": "url"}},
-                        "AIRTABLE_BASE_ID": {"fromSecret": "AIRTABLE_BASE_ID"},
-                        "AIRTABLE_API_KEY": {"fromSecret": "AIRTABLE_API_KEY"}
+                        "PORT": {"fromService": {"id": "debt-assess-backend", "value": "port"}}
                     },
                     "ci": {
                         "type": "ec2"
