@@ -17,16 +17,12 @@
                     "repository": {
                         "branch": "main"
                     },
+                    "target": {"type": "fargate"},
                     "buildCommand": "npm install && npm run build",
                     "startCommand": "node server.js",
                     "port": 3000,
                     "installCommand": "npm install",
-                    "healthCheckPath": "/api/health",
-                    "env": {
-                        "NODE_ENV": "production",
-                        "PORT": {"fromService": {"id": "debt-assess-backend", "value": "port"}}
-                       
-                    },
+                    "healthCheckPath": "/api/health",                    
                     "ci": {
                         "type": "ec2"
                     },
