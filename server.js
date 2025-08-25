@@ -16,8 +16,12 @@ const __dirname = dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Trust proxy - required when behind load balancer (AWS ALB, CloudFront, etc)
-app.set('trust proxy', true);
+// Trust proxy - configure for AWS ALB/CloudFront
+// Options: 
+// - Number: trust first n proxies (1 for single ALB)
+// - Array: trust specific IPs
+// - Function: custom trust logic
+app.set('trust proxy', 1); // Trust first proxy (AWS ALB)
 
 // Airtable configuration
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
@@ -56,7 +60,16 @@ app.use(express.json({ limit: '10mb' }));
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true, // Return rate limit info in headers
+  legacyHeaders: false, // Disable X-RateLimit headers
+  // Skip successful requests from rate limit
+  skipSuccessfulRequests: false,
+  // Trust proxy setting handled by Express
+  validate: {
+    trustProxy: false, // Disable the trust proxy validation warning
+    xForwardedForHeader: false // We handle this via Express settings
+  }
 });
 
 // Apply rate limiting to API routes
@@ -66,7 +79,13 @@ app.use('/api/', limiter);
 const submitLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 10, // Limit each IP to 10 submissions per hour
-  message: 'Too many submissions, please try again later.'
+  message: 'Too many submissions, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+  validate: {
+    trustProxy: false,
+    xForwardedForHeader: false
+  }
 });
 
 // Helper function to create Airtable records

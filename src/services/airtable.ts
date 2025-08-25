@@ -1,127 +1,94 @@
 import { QuizResult, QuizAnswer } from '../types/quiz';
 import { questions } from '../data/questions';
-import { submitQuizToAirtableProxy } from './airtable-proxy';
 
-const AIRTABLE_BASE_URL = 'https://api.airtable.com/v0';
-
-interface AirtableConfig {
-  baseId: string;
-  apiKey: string;
-}
-
-function getAirtableConfig(): AirtableConfig | null {
-  const baseId = import.meta.env.VITE_AIRTABLE_BASE_ID;
-  const apiKey = import.meta.env.VITE_AIRTABLE_API_KEY;
-  
-  // If no direct API credentials, use proxy
-  if (!baseId || !apiKey) {
-    return null;
-  }
-  
-  return { baseId, apiKey };
-}
-
-async function createRecord(tableName: string, fields: Record<string, any>) {
-  const config = getAirtableConfig();
-  if (!config) {
-    throw new Error('Direct API not configured');
-  }
-  const { baseId, apiKey } = config;
-  
-  const response = await fetch(`${AIRTABLE_BASE_URL}/${baseId}/${encodeURIComponent(tableName)}`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      records: [{ fields }]
-    })
-  });
-  
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Airtable API error: ${error}`);
-  }
-  
-  return response.json();
-}
+// Always use the Express server endpoint to protect API keys
+const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT || 'http://localhost:3001/api/submit-quiz';
 
 export async function submitQuizToAirtable(result: QuizResult): Promise<string> {
-  // Check if direct API is configured, otherwise use proxy
-  const config = getAirtableConfig();
-  if (!config) {
-    console.log('Using proxy for Airtable submission');
-    return submitQuizToAirtableProxy(result);
-  }
-  
-  console.log('Using direct API for Airtable submission');
   try {
-    const responseId = `resp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const responseId = `resp_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     
-    const responseData = {
-      'Response ID': responseId,
-      'Submission Date': new Date().toISOString().split('T')[0], // YYYY-MM-DD format for Airtable
-      'Primary Profile Type': result.primaryProfile.type,
-      'Primary Profile Name': result.primaryProfile.name,
-      'Match Percentage': result.primaryProfile.matchPercentage,
-      'Readiness Score': result.readinessScore,
-      'Readiness Level': result.readinessLevel,
-      'Student Score': result.profileScores.student,
-      'Credit Score': result.profileScores.credit,
-      'Medical Score': result.profileScores.medical,
-      'Mortgage Score': result.profileScores.mortgage,
-      'Multi Score': result.profileScores.multi,
-      'Solidarity Score': result.profileScores.solidarity,
-      'Freeform Response': result.freeformResponse?.trim() || '',
-      'Contact Info': result.contactInfo?.trim() || ''
+    // Prepare the submission data
+    const submissionData = {
+      responseId,
+      mainRecord: {
+        'Response ID': responseId,
+        'Submission Date': new Date().toISOString().split('T')[0], // YYYY-MM-DD format for Airtable
+        'Primary Profile Type': result.primaryProfile.type,
+        'Primary Profile Name': result.primaryProfile.name,
+        'Match Percentage': result.primaryProfile.matchPercentage,
+        'Readiness Score': result.readinessScore,
+        'Readiness Level': result.readinessLevel,
+        'Student Score': result.profileScores.student,
+        'Credit Score': result.profileScores.credit,
+        'Medical Score': result.profileScores.medical,
+        'Mortgage Score': result.profileScores.mortgage,
+        'Multi Score': result.profileScores.multi,
+        'Solidarity Score': result.profileScores.solidarity,
+        'Freeform Response': result.freeformResponse?.trim() || '',
+        'Contact Info': result.contactInfo?.trim() || ''
+      },
+      answerRecords: result.answers.map((answer: QuizAnswer) => {
+        const question = questions.find(q => q.id === answer.questionId);
+        
+        return {
+          'Response ID': responseId,
+          'Question ID': answer.questionId,
+          'Question Text': question?.question || '',
+          'Answer Type': question?.type || 'multiple-choice',
+          'Selected Option': answer.selectedOption,
+          'Ranked Options': answer.rankedOptions ? JSON.stringify(answer.rankedOptions) : '',
+          'Multi Select Options': answer.multiSelectOptions ? JSON.stringify(answer.multiSelectOptions) : ''
+        };
+      })
     };
     
-    await createRecord('Quiz Responses', responseData);
-    
-    const answerPromises = result.answers.map((answer: QuizAnswer) => {
-      const question = questions.find(q => q.id === answer.questionId);
-      
-      const answerData = {
-        'Response ID': responseId,
-        'Question ID': answer.questionId,
-        'Question Text': question?.question || '',
-        'Answer Type': question?.type || 'multiple-choice',
-        'Selected Option': answer.selectedOption,
-        'Ranked Options': answer.rankedOptions ? JSON.stringify(answer.rankedOptions) : '',
-        'Multi Select Options': answer.multiSelectOptions ? JSON.stringify(answer.multiSelectOptions) : ''
-      };
-      
-      return createRecord('Individual Answers', answerData);
+    // Submit through Express server endpoint
+    const response = await fetch(API_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(submissionData)
     });
     
-    await Promise.all(answerPromises);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Submission failed: ${errorText}`);
+    }
     
-    return responseId;
+    const data = await response.json();
+    return data.responseId || responseId;
   } catch (error) {
-    console.error('Error submitting to Airtable:', error);
+    console.error('Error submitting quiz:', error);
+    
+    // Fallback: Store in localStorage if API fails
+    try {
+      const localStorageKey = `quiz_response_${Date.now()}`;
+      localStorage.setItem(localStorageKey, JSON.stringify(result));
+      console.log('Response saved locally as fallback:', localStorageKey);
+    } catch (storageError) {
+      console.error('Failed to save to localStorage:', storageError);
+    }
+    
     throw new Error(error instanceof Error ? error.message : 'Failed to submit quiz response. Please try again.');
   }
 }
 
 export async function testAirtableConnection(): Promise<boolean> {
   try {
-    const config = getAirtableConfig();
-    if (!config) {
-      // Test proxy connection instead
-      const { testProxyConnection } = await import('./airtable-proxy');
-      return testProxyConnection();
-    }
-    const { baseId, apiKey } = config;
-    
-    const response = await fetch(`${AIRTABLE_BASE_URL}/${baseId}/Quiz%20Responses?maxRecords=1`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`
-      }
+    // Test the Express server health endpoint
+    const healthEndpoint = API_ENDPOINT.replace('/submit-quiz', '/health');
+    const response = await fetch(healthEndpoint, {
+      method: 'GET'
     });
     
-    return response.ok;
+    if (response.ok) {
+      const data = await response.json();
+      return data.configured === true;
+    }
+    
+    return false;
   } catch (error) {
     console.error('Airtable connection test failed:', error);
     return false;
