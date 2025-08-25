@@ -16,6 +16,9 @@ const __dirname = dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Trust proxy - required when behind load balancer (AWS ALB, CloudFront, etc)
+app.set('trust proxy', true);
+
 // Airtable configuration
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
@@ -37,7 +40,11 @@ app.use(helmet({
 // CORS configuration
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL || 'https://dh3k78nj5f7q6.cloudfront.net'
+    ? [
+        process.env.FRONTEND_URL,
+        'https://debt.leoasaservice.com',
+        'https://dh3k78nj5f7q6.cloudfront.net'
+      ].filter(Boolean)
     : ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'],
   credentials: true
 }));

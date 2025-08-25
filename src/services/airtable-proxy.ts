@@ -24,7 +24,7 @@ export async function submitQuizToAirtableProxy(result: QuizResult): Promise<str
       responseId,
       mainRecord: {
         'Response ID': responseId,
-        'Submission Date': new Date().toISOString(),
+        'Submission Date': new Date().toISOString().split('T')[0], // YYYY-MM-DD format for Airtable
         'Primary Profile Type': result.primaryProfile.type,
         'Primary Profile Name': result.primaryProfile.name,
         'Match Percentage': result.primaryProfile.matchPercentage,
