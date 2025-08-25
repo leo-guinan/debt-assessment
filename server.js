@@ -37,7 +37,7 @@ app.use(helmet({
 // CORS configuration
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? process.env.FRONTEND_URL || 'https://your-domain.com'
+    ? process.env.FRONTEND_URL || 'https://dh3k78nj5f7q6.cloudfront.net'
     : ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'],
   credentials: true
 }));
