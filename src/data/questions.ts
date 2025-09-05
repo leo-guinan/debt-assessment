@@ -3,7 +3,7 @@ import { Question } from '../types/quiz';
 export const questions: Question[] = [
   {
     id: 1,
-    question: "Select and rank all types of debt you have, from highest amount to lowest:",
+    question: "Select and rank all types of debt you have, by total debt from highest to lowest:",
     type: 'drag-drop',
     options: [
       {
@@ -27,29 +27,116 @@ export const questions: Question[] = [
         scoring: { profiles: { mortgage: 1 } }
       },
       {
-        label: "Multiple sources equally",
-        value: "E",
-        scoring: { profiles: { multi: 1 } }
-      },
-      {
         label: "Car loan",
-        value: "F",
+        value: "E",
         scoring: { profiles: { mortgage: 1 } }
       },
       {
         label: "Buy now, pay later (Klarna, Afterpay, etc.)",
-        value: "G",
+        value: "F",
         scoring: { profiles: { credit: 1 } }
       },
       {
         label: "I have no debt",
-        value: "H",
+        value: "G",
         scoring: { profiles: { solidarity: 1 } }
       }
     ]
   },
   {
     id: 2,
+    question: "For each type of debt you have, what APR range does it fall into?",
+    type: 'multi-select',
+    options: [
+      {
+        label: "Credit Cards: 0-10%",
+        value: "CC1",
+        scoring: {}
+      },
+      {
+        label: "Credit Cards: 10-15%",
+        value: "CC2",
+        scoring: {}
+      },
+      {
+        label: "Credit Cards: 15-20%",
+        value: "CC3",
+        scoring: {}
+      },
+      {
+        label: "Credit Cards: 20-25%",
+        value: "CC4",
+        scoring: {}
+      },
+      {
+        label: "Credit Cards: 25%+",
+        value: "CC5",
+        scoring: { profiles: { credit: 1 } }
+      },
+      {
+        label: "Mortgage: 1-3%",
+        value: "M1",
+        scoring: {}
+      },
+      {
+        label: "Mortgage: 4-5%",
+        value: "M2",
+        scoring: {}
+      },
+      {
+        label: "Mortgage: 6-8%",
+        value: "M3",
+        scoring: {}
+      },
+      {
+        label: "Mortgage: 8%+",
+        value: "M4",
+        scoring: { profiles: { mortgage: 1 } }
+      },
+      {
+        label: "Student Loans: 0-3%",
+        value: "SL1",
+        scoring: {}
+      },
+      {
+        label: "Student Loans: 3-5%",
+        value: "SL2",
+        scoring: {}
+      },
+      {
+        label: "Student Loans: 5-7%",
+        value: "SL3",
+        scoring: {}
+      },
+      {
+        label: "Student Loans: 7%+",
+        value: "SL4",
+        scoring: { profiles: { student: 1 } }
+      },
+      {
+        label: "Car Loan: 0-5%",
+        value: "CL1",
+        scoring: {}
+      },
+      {
+        label: "Car Loan: 5-10%",
+        value: "CL2",
+        scoring: {}
+      },
+      {
+        label: "Car Loan: 10%+",
+        value: "CL3",
+        scoring: {}
+      },
+      {
+        label: "Not applicable - I have no debt",
+        value: "NA",
+        scoring: { profiles: { solidarity: 1 } }
+      }
+    ]
+  },
+  {
+    id: 3,
     question: "What percentage of your monthly income goes to debt payments?",
     options: [
       {
@@ -80,193 +167,48 @@ export const questions: Question[] = [
     ]
   },
   {
-    id: 3,
+    id: 4,
     question: "Which describes your relationship with traditional debt solutions?",
     options: [
       {
-        label: "Haven't tried many options yet",
+        label: "No need, I'm able to maintain my current obligations",
         value: "A",
         scoring: {}
       },
       {
-        label: "Currently using consolidation or payment plans",
+        label: "Haven't tried many options yet",
         value: "B",
         scoring: {}
       },
       {
-        label: "Used debt consolidation in the past but am now back in debt",
+        label: "Currently using consolidation or payment plans",
         value: "C",
-        scoring: { readiness: 20 }
+        scoring: {}
       },
       {
-        label: "Tried multiple solutions without success",
+        label: "Used debt consolidation in the past but am now back in debt",
         value: "D",
         scoring: { readiness: 20 }
       },
       {
-        label: "Given up on traditional solutions",
+        label: "Tried multiple solutions without success",
         value: "E",
         scoring: { readiness: 20 }
       },
       {
-        label: "Not applicable - I avoid debt on principle",
+        label: "Given up on traditional solutions",
         value: "F",
+        scoring: { readiness: 20 }
+      },
+      {
+        label: "Not applicable - I avoid debt on principle",
+        value: "G",
         scoring: { readiness: 10, profiles: { solidarity: 2 } }
       }
     ]
   },
   {
-    id: 4,
-    question: "Are you supporting anyone else financially?",
-    options: [
-      {
-        label: "No, just myself",
-        value: "A",
-        scoring: {}
-      },
-      {
-        label: "Partner/Spouse",
-        value: "B",
-        scoring: {}
-      },
-      {
-        label: "Children",
-        value: "C",
-        scoring: { readiness: 5, profiles: { multi: 1 } }
-      },
-      {
-        label: "Aging parents",
-        value: "D",
-        scoring: { readiness: 5, profiles: { multi: 1 } }
-      },
-      {
-        label: "Multiple generations",
-        value: "E",
-        scoring: { readiness: 10, profiles: { multi: 2 } }
-      }
-    ]
-  },
-  {
     id: 5,
-    question: "Which alternative economic model interests you most?",
-    options: [
-      {
-        label: "Cooperative ownership/sharing",
-        value: "A",
-        scoring: { readiness: 10 }
-      },
-      {
-        label: "Mutual aid networks",
-        value: "B",
-        scoring: { readiness: 10 }
-      },
-      {
-        label: "Community lending circles",
-        value: "C",
-        scoring: { readiness: 10 }
-      },
-      {
-        label: "Time banks/Skill sharing",
-        value: "D",
-        scoring: { readiness: 10 }
-      },
-      {
-        label: "All of the above",
-        value: "E",
-        scoring: { readiness: 15 }
-      },
-      {
-        label: "I haven't heard of any of these options",
-        value: "F",
-        scoring: {}
-      }
-    ]
-  },
-  {
-    id: 6,
-    question: "What's your view on the current financial system?",
-    options: [
-      {
-        label: "It works, I just need to use it better",
-        value: "A",
-        scoring: {}
-      },
-      {
-        label: "Has flaws but can be navigated",
-        value: "B",
-        scoring: {}
-      },
-      {
-        label: "Fundamentally broken",
-        value: "C",
-        scoring: { readiness: 15 }
-      },
-      {
-        label: "Designed to exploit people",
-        value: "D",
-        scoring: { readiness: 15 }
-      }
-    ]
-  },
-  {
-    id: 7,
-    question: "How comfortable are you sharing your debt story publicly?",
-    options: [
-      {
-        label: "Very private about finances",
-        value: "A",
-        scoring: {}
-      },
-      {
-        label: "Share with close friends/family",
-        value: "B",
-        scoring: {}
-      },
-      {
-        label: "Open in support groups",
-        value: "C",
-        scoring: { readiness: 10 }
-      },
-      {
-        label: "Willing to advocate publicly",
-        value: "D",
-        scoring: { readiness: 10 }
-      }
-    ]
-  },
-  {
-    id: 8,
-    question: "What best describes your employment situation?",
-    options: [
-      {
-        label: "Stable full-time employment",
-        value: "A",
-        scoring: {}
-      },
-      {
-        label: "Multiple jobs/gig work",
-        value: "B",
-        scoring: { readiness: 5, profiles: { multi: 1 } }
-      },
-      {
-        label: "Underemployed for my education",
-        value: "C",
-        scoring: { profiles: { student: 1 } }
-      },
-      {
-        label: "Unstable/seeking work",
-        value: "D",
-        scoring: {}
-      },
-      {
-        label: "Unable to work full-time",
-        value: "E",
-        scoring: { profiles: { medical: 1 } }
-      }
-    ]
-  },
-  {
-    id: 9,
     question: "What's your timeline for getting out of debt?",
     options: [
       {
@@ -293,6 +235,125 @@ export const questions: Question[] = [
         label: "Accepted it as permanent",
         value: "E",
         scoring: { readiness: 5 }
+      }
+    ]
+  },
+  {
+    id: 6,
+    question: "Are you supporting anyone else financially?",
+    options: [
+      {
+        label: "No, just myself",
+        value: "A",
+        scoring: {}
+      },
+      {
+        label: "Partner/Spouse",
+        value: "B",
+        scoring: {}
+      },
+      {
+        label: "Children",
+        value: "C",
+        scoring: { readiness: 5, profiles: { multi: 1 } }
+      },
+      {
+        label: "Aging parents",
+        value: "D",
+        scoring: { readiness: 5, profiles: { multi: 1 } }
+      },
+      {
+        label: "Friends and/or Community",
+        value: "E",
+        scoring: { readiness: 5, profiles: { solidarity: 1 } }
+      },
+      {
+        label: "Multiple generations",
+        value: "F",
+        scoring: { readiness: 10, profiles: { multi: 2 } }
+      }
+    ]
+  },
+  {
+    id: 7,
+    question: "Would you be interested in a cooperative/collaborative finance model that reduces your monthly payments and total cost of servicing your debt in a way that helps others do the same?",
+    options: [
+      {
+        label: "Yes, definitely",
+        value: "A",
+        scoring: { readiness: 20 }
+      },
+      {
+        label: "Yes, but I'd need to know more",
+        value: "B",
+        scoring: { readiness: 10 }
+      },
+      {
+        label: "Maybe, depends on the specifics",
+        value: "C",
+        scoring: { readiness: 5 }
+      },
+      {
+        label: "No, I prefer traditional approaches",
+        value: "D",
+        scoring: {}
+      },
+      {
+        label: "Not applicable - I have no debt",
+        value: "E",
+        scoring: { profiles: { solidarity: 2 } }
+      }
+    ]
+  },
+  {
+    id: 8,
+    question: "What's your view on the current financial system?",
+    options: [
+      {
+        label: "It works, I just need to use it better",
+        value: "A",
+        scoring: {}
+      },
+      {
+        label: "Has flaws but can be navigated",
+        value: "B",
+        scoring: {}
+      },
+      {
+        label: "Fundamentally broken",
+        value: "C",
+        scoring: { readiness: 15 }
+      },
+      {
+        label: "Designed to exploit people",
+        value: "D",
+        scoring: { readiness: 15 }
+      }
+    ]
+  },
+  {
+    id: 9,
+    question: "How comfortable are you sharing your debt story?",
+    options: [
+      {
+        label: "Very private about finances",
+        value: "A",
+        scoring: {}
+      },
+      {
+        label: "Share with close friends/family",
+        value: "B",
+        scoring: {}
+      },
+      {
+        label: "Open in support groups/community",
+        value: "C",
+        scoring: { readiness: 10 }
+      },
+      {
+        label: "Willing to advocate publicly",
+        value: "D",
+        scoring: { readiness: 10 }
       }
     ]
   },

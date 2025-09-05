@@ -35,16 +35,18 @@ Create a table named "Quiz Responses" with these fields:
 
 Create a table named "Individual Answers" with these fields:
 
+**⚠️ IMPORTANT: Field names must have NO SPACES in Airtable. Use the exact names below:**
+
 | Field Name | Field Type | Notes |
 |------------|------------|-------|
 | ID | Autonumber | Primary field |
-| Response ID | Single line text | Links to Quiz Responses |
-| Question ID | Number | Integer |
-| Question Text | Long text | - |
-| Answer Type | Single select | Options: multiple-choice, freeform, drag-drop, multi-select |
-| Selected Option | Single line text | - |
-| Ranked Options | Long text | JSON array as string |
-| Multi Select Options | Long text | JSON array as string |
+| ResponseID | Single line text | Links to Quiz Responses (NO SPACE in field name) |
+| QuestionID | Number | Integer (NO SPACE in field name) |
+| QuestionText | Long text | - (NO SPACE in field name) |
+| AnswerType | Single select | Options: multiple-choice, freeform, drag-drop, multi-select (NO SPACE in field name) |
+| SelectedOption | Single line text | - (NO SPACE in field name) |
+| RankedOptions | Long text | JSON array as string (NO SPACE in field name) |
+| MultiSelectOptions | Long text | JSON array as string (NO SPACE in field name) |
 | Created At | Created time | Auto-generated |
 
 ## 3. Get API Credentials
